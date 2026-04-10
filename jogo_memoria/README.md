@@ -19,3 +19,6 @@ Implementações Adicionadas:
 # R03
 Correções de código estrutural:
 - Correção de callbacks assíncronos do Tkinter, funções não acessam widgets destruídos
+
+# R04
+- Estilização do sistema
