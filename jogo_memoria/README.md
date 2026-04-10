@@ -9,3 +9,8 @@ Implementações Adicionadas:
 - Mensagem de vitória
 - Travamento de clique durante verificação do par
 - Botão de reiniciar
+
+# R02
+Implementações Adicionadas:
+- Menu principal com seleção de níveis
+- 3 níveis de dificuldade: Fácil (4 pares), Médio (6 pares), Difícil (8 pares)
