@@ -22,3 +22,7 @@ Correções de código estrutural:
 
 # R04
 - Estilização do sistema
+
+# R05
+- Estilização finalizada
+- Aumento e centralização dos elementos do sistema
