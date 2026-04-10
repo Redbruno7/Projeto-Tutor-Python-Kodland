@@ -1,2 +1,11 @@
-# Projeto-Tutor-Python-Kodland
-Projeto proposto para tutoria de Python Pro para a Kodland Brasil
+# R00
+Desenvolvimento Base do Jogo da Memória:
+- Dificuldade única:
+    ° 6 pares (3 x 4)
+
+# R01
+Implementações Adicionadas:
+- Contagem de jogadas
+- Mensagem de vitória
+- Travamento de clique durante verificação do par
+- Botão de reiniciar
