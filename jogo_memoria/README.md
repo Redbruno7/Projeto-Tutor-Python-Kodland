@@ -26,3 +26,8 @@ Correções de código estrutural:
 # R05
 - Estilização finalizada
 - Aumento e centralização dos elementos do sistema
+
+# R06
+Implementações:
+- Cronômetro
+- Animação de virada de carta

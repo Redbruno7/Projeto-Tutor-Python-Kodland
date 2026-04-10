@@ -12,6 +12,7 @@ class MemoryGame:
         self.root.state("zoomed")
 
         self.after_id = None
+        self.timer_id = None
 
         self.show_menu()
 
@@ -63,15 +64,12 @@ class MemoryGame:
 
     # ---------------- CONFIGURAÇÃO ----------------
     def setup_game(self):
+        base_path = os.path.dirname(__file__)
+        image_path = os.path.join(base_path, "images")
+
         all_images = [
-            "images/arcade.png",
-            "images/block.png",
-            "images/bomba.png",
-            "images/escudo.png",
-            "images/espada.png",
-            "images/fone.png",
-            "images/joystick.png",
-            "images/pc.png"
+            "arcade.png", "block.png", "bomba.png", "escudo.png",
+            "espada.png", "fone.png", "joystick.png", "pc.png"
         ]
 
         selected = all_images[:self.pairs]
@@ -79,19 +77,15 @@ class MemoryGame:
         self.cards = selected * 2
         random.shuffle(self.cards)
 
-        base_path = os.path.dirname(__file__)
-
         self.images = {}
-        for path in set(self.cards):
-            full_path = os.path.join(base_path, path)
-            img = Image.open(full_path)
+        for name in set(self.cards):
+            img = Image.open(os.path.join(image_path, name))
             img = img.resize((120, 120))
-            self.images[path] = ImageTk.PhotoImage(img)
+            self.images[name] = ImageTk.PhotoImage(img)
 
-        back_path = os.path.join(base_path, "images", "back.png")
-        img = Image.open(back_path)
-        img = img.resize((120, 120))
-        self.back_image = ImageTk.PhotoImage(img)
+        back_img = Image.open(os.path.join(image_path, "back.png"))
+        back_img = back_img.resize((120, 120))
+        self.back_image = ImageTk.PhotoImage(back_img)
 
         self.buttons = []
         self.first = None
@@ -99,6 +93,10 @@ class MemoryGame:
         self.lock = False
         self.moves = 0
         self.matches = 0
+
+        # TIMER
+        self.seconds = 0
+        self.timer_running = False
 
     # ---------------- INTERFACE ----------------
     def create_widgets(self):
@@ -108,17 +106,25 @@ class MemoryGame:
         container.place(relx=0.5, rely=0.5, anchor="center")
         container.configure(padx=20, pady=20)
 
-        self.label_moves = tk.Label(
+        self.label_timer = tk.Label(
             container,
-            text="Jogadas: 0",
-            font=("Arial", 18, "bold"),
+            text="Tempo: 0s",
+            font=("Arial", 16),
             bg="#1e1e2f",
             fg="white"
         )
-        self.label_moves.grid(row=0, column=0, columnspan=4, pady=15)
+        self.label_timer.grid(row=0, column=0, columnspan=2)
+
+        self.label_moves = tk.Label(
+            container,
+            text="Jogadas: 0",
+            font=("Arial", 16, "bold"),
+            bg="#1e1e2f",
+            fg="white"
+        )
+        self.label_moves.grid(row=0, column=2, columnspan=2)
 
         cols = 4
-        rows = len(self.cards) // cols
 
         for i in range(len(self.cards)):
             btn = tk.Button(
@@ -139,7 +145,7 @@ class MemoryGame:
             fg="white",
             font=("Arial", 12, "bold"),
             command=self.restart_game
-        ).grid(row=rows + 2, column=0, columnspan=2, pady=15)
+        ).grid(row=(len(self.cards)//4) + 2, column=0, columnspan=2, pady=15)
 
         tk.Button(
             container,
@@ -148,7 +154,37 @@ class MemoryGame:
             fg="white",
             font=("Arial", 12, "bold"),
             command=self.show_menu
-        ).grid(row=rows + 2, column=2, columnspan=2, pady=15)
+        ).grid(row=(len(self.cards)//4) + 2, column=2, columnspan=2, pady=15)
+
+        # inicia timer
+        self.timer_running = True
+        self.update_timer()
+
+    # ---------------- TIMER ----------------
+    def update_timer(self):
+        if self.timer_running:
+            self.seconds += 1
+            self.label_timer.config(text=f"Tempo: {self.seconds}s")
+            self.timer_id = self.root.after(1000, self.update_timer)
+
+    # ---------------- ANIMAÇÃO ----------------
+    def animate_flip(self, button, new_image):
+        def shrink(width):
+            if width > 20:
+                button.config(width=width)
+                self.root.after(10, lambda: shrink(width - 10))
+            else:
+                button.config(image=new_image)
+                expand(20)
+
+        def expand(width):
+            if width < 120:
+                button.config(width=width)
+                self.root.after(10, lambda: expand(width + 10))
+            else:
+                button.config(width=120)
+
+        shrink(120)
 
     # ---------------- LÓGICA ----------------
     def reveal(self, index):
@@ -159,7 +195,7 @@ class MemoryGame:
         if btn["state"] == "disabled":
             return
 
-        btn.config(image=self.images[self.cards[index]])
+        self.animate_flip(btn, self.images[self.cards[index]])
 
         if self.first is None:
             self.first = index
@@ -173,11 +209,8 @@ class MemoryGame:
 
     def check_match(self):
         if self.cards[self.first] == self.cards[self.second]:
-            self.buttons[self.first].config(bg="#4CAF50")
-            self.buttons[self.second].config(bg="#4CAF50")
-
-            self.buttons[self.first].config(state="disabled")
-            self.buttons[self.second].config(state="disabled")
+            self.buttons[self.first].config(bg="#4CAF50", state="disabled")
+            self.buttons[self.second].config(bg="#4CAF50", state="disabled")
 
             self.matches += 1
 
@@ -198,8 +231,11 @@ class MemoryGame:
         if self.first is None or self.second is None:
             return
 
-        self.buttons[self.first].config(image=self.back_image, bg="#2d2d44")
-        self.buttons[self.second].config(image=self.back_image, bg="#2d2d44")
+        self.animate_flip(self.buttons[self.first], self.back_image)
+        self.animate_flip(self.buttons[self.second], self.back_image)
+
+        self.buttons[self.first].config(bg="#2d2d44")
+        self.buttons[self.second].config(bg="#2d2d44")
 
         self.first = None
         self.second = None
@@ -207,9 +243,14 @@ class MemoryGame:
 
     # ---------------- RESULTADO ----------------
     def show_victory(self):
+        self.timer_running = False
+
+        if self.timer_id:
+            self.root.after_cancel(self.timer_id)
+
         tk.Label(
             self.root,
-            text=f"Você venceu em {self.moves} jogadas!",
+            text=f"Você venceu em {self.moves} jogadas e {self.seconds}s!",
             font=("Arial", 18, "bold"),
             bg="#1e1e2f",
             fg="#4CAF50"
@@ -226,6 +267,13 @@ class MemoryGame:
             except:
                 pass
             self.after_id = None
+
+        if self.timer_id:
+            try:
+                self.root.after_cancel(self.timer_id)
+            except:
+                pass
+            self.timer_id = None
 
         for widget in self.root.winfo_children():
             widget.destroy()
