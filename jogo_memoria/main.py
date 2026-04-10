@@ -5,7 +5,23 @@ from PIL import Image, ImageTk
 
 
 class MemoryGame:
+    """
+    Classe principal do Jogo da Memória.
+
+    Responsável por:
+    - Gerenciar a interface gráfica (Tkinter)
+    - Controlar a lógica do jogo
+    - Manipular imagens e estados das cartas
+    - Gerenciar o cronômetro e animações
+    """
+
     def __init__(self, root):
+        """
+        Inicializa a aplicação do jogo.
+
+        Args:
+            root (tk.Tk): Janela principal do Tkinter.
+        """
         self.root = root
         self.root.title("Jogo da Memória")
         self.root.configure(bg="#1e1e2f")
@@ -16,8 +32,10 @@ class MemoryGame:
 
         self.show_menu()
 
-    # ---------------- MENU ----------------
     def show_menu(self):
+        """
+        Exibe o menu principal do jogo com opções de dificuldade.
+        """
         self.clear_screen()
 
         container = tk.Frame(self.root, bg="#1e1e2f")
@@ -45,6 +63,14 @@ class MemoryGame:
         self.create_menu_button("Difícil (8 pares)", 8, container)
 
     def create_menu_button(self, text, pairs, parent):
+        """
+        Cria um botão de seleção de dificuldade no menu.
+
+        Args:
+            text (str): Texto exibido no botão.
+            pairs (int): Quantidade de pares para o jogo.
+            parent (tk.Widget): Container onde o botão será inserido.
+        """
         tk.Button(
             parent,
             text=text,
@@ -56,14 +82,24 @@ class MemoryGame:
             command=lambda: self.start_game(pairs)
         ).pack(pady=8)
 
-    # ---------------- INICIAR JOGO ----------------
     def start_game(self, pairs):
+        """
+        Inicia uma nova partida com a quantidade de pares escolhida.
+
+        Args:
+            pairs (int): Número de pares de cartas.
+        """
         self.pairs = pairs
         self.setup_game()
         self.create_widgets()
 
-    # ---------------- CONFIGURAÇÃO ----------------
     def setup_game(self):
+        """
+        Configura os dados iniciais do jogo:
+        - Carrega imagens
+        - Embaralha cartas
+        - Inicializa variáveis de controle
+        """
         base_path = os.path.dirname(__file__)
         image_path = os.path.join(base_path, "images")
 
@@ -94,12 +130,17 @@ class MemoryGame:
         self.moves = 0
         self.matches = 0
 
-        # TIMER
         self.seconds = 0
         self.timer_running = False
 
-    # ---------------- INTERFACE ----------------
     def create_widgets(self):
+        """
+        Cria os elementos visuais do jogo:
+        - Tabuleiro de cartas
+        - Contador de jogadas
+        - Cronômetro
+        - Botões de controle
+        """
         self.clear_screen()
 
         container = tk.Frame(self.root, bg="#1e1e2f")
@@ -156,19 +197,26 @@ class MemoryGame:
             command=self.show_menu
         ).grid(row=(len(self.cards)//4) + 2, column=2, columnspan=2, pady=15)
 
-        # inicia timer
         self.timer_running = True
         self.update_timer()
 
-    # ---------------- TIMER ----------------
     def update_timer(self):
+        """
+        Atualiza o cronômetro a cada segundo enquanto o jogo estiver ativo.
+        """
         if self.timer_running:
             self.seconds += 1
             self.label_timer.config(text=f"Tempo: {self.seconds}s")
             self.timer_id = self.root.after(1000, self.update_timer)
 
-    # ---------------- ANIMAÇÃO ----------------
     def animate_flip(self, button, new_image):
+        """
+        Executa uma animação simples de "flip" da carta.
+
+        Args:
+            button (tk.Button): Botão da carta.
+            new_image (PhotoImage): Nova imagem a ser exibida.
+        """
         def shrink(width):
             if width > 20:
                 button.config(width=width)
@@ -186,8 +234,13 @@ class MemoryGame:
 
         shrink(120)
 
-    # ---------------- LÓGICA ----------------
     def reveal(self, index):
+        """
+        Revela uma carta selecionada pelo jogador.
+
+        Args:
+            index (int): Índice da carta no tabuleiro.
+        """
         if self.lock:
             return
 
@@ -208,6 +261,9 @@ class MemoryGame:
             self.after_id = self.root.after(800, self.check_match)
 
     def check_match(self):
+        """
+        Verifica se as duas cartas selecionadas formam um par.
+        """
         if self.cards[self.first] == self.cards[self.second]:
             self.buttons[self.first].config(bg="#4CAF50", state="disabled")
             self.buttons[self.second].config(bg="#4CAF50", state="disabled")
@@ -228,6 +284,9 @@ class MemoryGame:
             self.show_victory()
 
     def reset_cards(self):
+        """
+        Reseta as cartas selecionadas quando não formam um par.
+        """
         if self.first is None or self.second is None:
             return
 
@@ -241,8 +300,10 @@ class MemoryGame:
         self.second = None
         self.lock = False
 
-    # ---------------- RESULTADO ----------------
     def show_victory(self):
+        """
+        Exibe a mensagem de vitória e interrompe o cronômetro.
+        """
         self.timer_running = False
 
         if self.timer_id:
@@ -256,11 +317,16 @@ class MemoryGame:
             fg="#4CAF50"
         ).place(relx=0.5, rely=0.85, anchor="center")
 
-    # ---------------- UTIL ----------------
     def restart_game(self):
+        """
+        Reinicia o jogo mantendo o mesmo nível de dificuldade.
+        """
         self.start_game(self.pairs)
 
     def clear_screen(self):
+        """
+        Limpa todos os widgets da tela e cancela timers ativos.
+        """
         if self.after_id:
             try:
                 self.root.after_cancel(self.after_id)

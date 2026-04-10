@@ -31,3 +31,6 @@ Correções de código estrutural:
 Implementações:
 - Cronômetro
 - Animação de virada de carta
+
+# R07
+- Docstrings adicionadas
