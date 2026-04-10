@@ -15,3 +15,7 @@ Implementações Adicionadas:
 - Menu principal com seleção de níveis
 - 3 níveis de dificuldade: Fácil (4 pares), Médio (6 pares), Difícil (8 pares)
 - Botão para voltar ao menu principal
+
+# R03
+Correções de código estrutural:
+- Correção de callbacks assíncronos do Tkinter, funções não acessam widgets destruídos
