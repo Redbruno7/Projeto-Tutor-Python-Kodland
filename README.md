@@ -1,4 +1,4 @@
-# Jogo da Memória (Memory Game)
+# Jogo da Memória
 
 Um jogo da memória interativo desenvolvido em Python utilizando Tkinter, com interface gráfica moderna, múltiplos níveis de dificuldade e sistema de animação.
 
@@ -45,18 +45,18 @@ O jogo permite ao usuário selecionar níveis de dificuldade e desafiar sua mem�
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
-- Python 3.x
+- Python 3.10 ou superior
 - Tkinter (interface gráfica)
 - Pillow (manipulação de imagens)
 
 ---
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```bash
-memory-game/
+jogo_memoria/
 │
 ├── images/
 │   ├── arcade.png
@@ -71,4 +71,4 @@ memory-game/
 │
 ├── main.py
 ├── requirements.txt
-└── README.md
+README.md
